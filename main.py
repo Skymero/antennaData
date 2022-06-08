@@ -17,7 +17,6 @@ def parse_gps(data_file, substrings):
                     gps_data.append(content)        
     f.close
     return gps_data
-    
 
 def parse_gsm(data_file, substrings):
     gsm_data = []
@@ -34,7 +33,38 @@ def parse_gsm(data_file, substrings):
                     gsm_data.append(content)        
     f.close
     return gsm_data
+
+def points_Count(data_points):
+
+    x = 0
+    data_dict = {}
+    num_points = int(len(data_points) / 7)
+    key_list = [] # Array with how many data points to be used
+
+    # How many data points
+    for i in range(num_points):
+        i += 1
+        key_list.append("Point" + str(i))
+    #print(key_list)
+    return key_list
+
+def data_dict(list_a, list_b):
+    # Creates a dictionary for all points
+    #adds array of 7 elements into one element in 2Darray
+    list_c = {}    
     
+    for x in range(0,len(data_index), 1):
+
+        # Add every 7 values as an element - 2D array
+        location_string = "Point " + str(x+1)
+        #print(location_string)
+        x_array = data_index[x:x+7]
+        #print(x_array)
+        list_c[location_string] = x_array
+        #print(data_index[x:x+7])
+    #print(list_c)
+    
+    return list_c
 
 def iterate_lists(list_a, list_b):
 
@@ -49,7 +79,7 @@ def iterate_lists(list_a, list_b):
 
     if mod_b < mod_a:
         cnt_limit =int( mod_b * 7)
-   
+    
     count = 0
     n = 0
     x = 0
@@ -74,84 +104,33 @@ def iterate_lists(list_a, list_b):
         else: count += 1        
     return list_c
 
-
-def generate_hashmap(data_points):
-    x = 0
-    data_dict = {}
-    num_points = int(len(data_points) / 7)
-    key_list = [] # Array with how many data points to be used
-
-    #create points for every 7 num_points
-    #   i.e if you have 14 data_points, num_points = 2
-    #   this also means you should have 2 dictionaries
-    #   w/ 7 keys and values.
-
-    for i in range(num_points):
-        i += 1
-        key_list.append("Point" + str(i))
-
-    key_num = int(len(key_list) - 1)
-    count = 0
-    
-    for j in range(key_num):
-
-        for v in range(num_points):
-            #adds 7 elements to dictionary per key
-            # should be point1: 7 items(0-6), point2: 7 items (7-13)
-            key = str(key_list[j])
-            if count < 1:              
-                data_dict[key] = data_points[v]
-                count += 1
-
-            if count > 0:                
-                data_dict[key].update(data_points[v])
-                count += 1
-        count = 0
-    return data_dict
-
-
+#################################################
 # Parameters needed for each datapoint
+
 substring_GPS = ['Latitude:','Longitude:', 'Altitude:', 'Satellites:', 'Quality:']
 substring_GSM = ['SigQuality:', 'SigQualitydBm:']
 key_list = ['lat', 'long', 'alt', 'qual', 'dbm']
+
+##########################################################
 
 # Parse through data to find needed parameters from each log
 data_gps = parse_gps('gps.log', substring_GPS)
 data_gsm = parse_gsm('gsm.log', substring_GSM)
 
+##########################################################
 # Combining parameters into one list
+
 data_index = iterate_lists(data_gps, data_gsm)
-print(data_index)
+point_list = points_Count(data_index)
+list_of_lists = data_dict(point_list, data_index)
 
-#print(data_index)
+for i in list_of_lists:
+    print("---------------------------")
+    print(" ")
+    print(i)
+    print(list_of_lists[i])
 
-
-# use data_index for a hashmap
-#hash_dict = generate_hashmap(data_index)
-
-#data_samples = []
-
-'''
-records = [
-    {long:123, lat: 456, ...}
-    ,{long:123, lat: 456, ...}
-    ,{long:123, lat: 456, ...}
-    ,{long:123, lat: 456, ...}
-    ,{long:123, lat: 456, ...}
-    ,{long:123, lat: 456, ...}
-    ,{long:123, lat: 456, ...}
-]
-
-for i in records:
-    variable1 = "long"
-    map.addPoint(records[i]["long"], records[i][variable1], records[i].value)
-
-
-{key1: [long:123, lat: 456, ...], key2}
-'''
-
-# use hashmap as reference for data points of DJANGO map
-
+# Finsh by adding this to a csv file or notepad in this format
 
 
 
